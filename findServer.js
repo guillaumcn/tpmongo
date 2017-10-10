@@ -25,6 +25,8 @@ function testConnexion(callback) {
 var findRestaurants = function (db, begin, size, callback) {
     resultats = [];
 
+    console.log("Obtention des restaurants à partir de " + begin + " jusqu'a " + (begin + size));
+
     var cursor = db.collection('restaurants').find({}).sort({borough: 1}).skip(begin).limit(size);
     var counter = 0;
     cursor.each(function (err, doc) {
@@ -35,6 +37,7 @@ var findRestaurants = function (db, begin, size, callback) {
         }
         if (doc !== null) {
             resultats.push(doc);
+            console.log("Obtention du restaurant : " + doc.name);
         } else {
             callback();
         }
@@ -56,6 +59,7 @@ function getRestaurants(begin, size, callback) {
 function deleteRestaurants(id, callback) {
     MongoClient.connect(url, function (err, db) {
         assert.equal(null, err);
+        console.log("Suppression du restaurant : " + id);
         db.collection('restaurants').deleteOne({_id: ObjectId(id)}, function (err, result) {
             callback();
             db.close();
@@ -66,6 +70,7 @@ function deleteRestaurants(id, callback) {
 function createRestaurant(queryParameters, callback) {
     MongoClient.connect(url, function (err, db) {
         assert.equal(null, err);
+        console.log("Ajout du restaurant : " + queryParameters['name']);
         db.collection('restaurants').insertOne( {
             address : {
                 street : "2 Avenue",
@@ -99,6 +104,7 @@ function createRestaurant(queryParameters, callback) {
 function updateRestaurant(queryParameters, callback) {
     MongoClient.connect(url, function (err, db) {
         assert.equal(null, err);
+        console.log("Modification du restaurant : " + queryParameters['name']);
         db.collection('restaurants').updateOne( {_id: ObjectId(queryParameters['id'])},  {
             cuisine : queryParameters['cuisine'],
             name : queryParameters['name']

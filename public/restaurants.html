@@ -1,0 +1,324 @@
+<!-- Include bootstrap -->
+<script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+      integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+
+<style>
+    table {
+        margin-top: 30px;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    button {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<script>
+
+    function testConnexion() {
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'testConnexion', true);
+
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function (e) {
+
+            document.body.innerHTML += '<div style="position:fixed; right: 20px; top:10px; " class="alert alert-success alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <strong>' + this.response + '</strong></div>';
+
+        };
+
+        // On envoie les paramètres de début et taille des résultats
+        xhr.send();
+    }
+
+    var startList = 0;
+    const sizePage = 10;
+
+    function getRestaurants() {
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'findRestaurants?begin=' + startList + '&size=' + sizePage, true);
+
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function (e) {
+
+            var restaurants = JSON.parse(this.response);
+
+            document.getElementById('tableau').innerHTML = "";
+            document.getElementById('pagination').innerHTML = "";
+
+            var table = document.createElement("table");
+            table.className = "table";
+            table.innerHTML += "<tr>" +
+                "<th>Nom du restaurant</th>" +
+                "<th>Cuisine</th>" +
+                "<th></th>" +
+                "<th></th>" +
+                "</tr>";
+
+            restaurants.forEach(function (r, index) {
+                var row = table.insertRow(-1);
+                var cell1 = row.insertCell(0);
+                cell1.innerHTML = r.name;
+                var cell2 = row.insertCell(1);
+                cell2.innerHTML = r.cuisine;
+                var cell3 = row.insertCell(2);
+                cell3.innerHTML = '<a ' +
+                    'href="#" ' +
+                    'class="glyphicon glyphicon-remove" ' +
+                    'onclick="deleteRestaurant(\'' + r._id + '\')"></a>';
+                var cell4 = row.insertCell(3);
+                cell4.innerHTML = '<a ' +
+                    'onclick="majFormulaire(\'' + r._id + '\', \'' + r.name + '\', \'' + r.cuisine + '\')" ' +
+                    'data-toggle="modal" ' +
+                    'data-target="#myModal2" ' +
+                    'class="glyphicon glyphicon-pencil"></a>';
+            });
+            var h1 = document.createElement("h1");
+            h1.className = "text-center";
+            h1.innerHTML += "Liste des restaurants";
+            document.getElementById("tableau").appendChild(h1);
+
+            document.getElementById('pagination').innerHTML +=
+                '<button ' +
+                'type="button" ' +
+                'onclick="debutListe();" ' +
+                'class="btn btn-danger col-xs-1 col-xs-offset-3">' +
+                'Début liste</button>';
+            document.getElementById('pagination').innerHTML +=
+                '<button ' +
+                'type="button" ' +
+                'onclick="loadPrevious();" ' +
+                'class="btn btn-primary col-xs-1 col-xs-offset-1">' +
+                'Précedent</button>';
+            document.getElementById('pagination').innerHTML +=
+                '<button ' +
+                'type="button" ' +
+                'onclick="loadNext();" ' +
+                'class="btn btn-primary col-xs-1 col-xs-offset-1">' +
+                'Suivant</button>';
+
+            document.getElementById("tableau").appendChild(table);
+
+        };
+
+        // On envoie les paramètres de début et taille des résultats
+        xhr.send();
+    }
+
+    function debutListe() {
+        startList = 0;
+
+        getRestaurants();
+    }
+
+    function loadPrevious() {
+        if (startList >= sizePage) {
+            startList -= sizePage;
+        }
+        getRestaurants();
+    }
+
+    function loadNext() {
+        startList += sizePage;
+
+        getRestaurants();
+    }
+
+    function deleteRestaurant(id) {
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'deleteRestaurant?id=' + id, true);
+
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function (e) {
+
+            getRestaurants();
+
+        };
+
+        // On envoie les paramètres de début et taille des résultats
+        xhr.send();
+    }
+
+    function createRestaurant() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'createRestaurant?'+serialize(document.getElementById('formRestaurantCreate')), true);
+
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function (e) {
+
+            getRestaurants();
+
+        };
+
+        // On envoie les paramètres de début et taille des résultats
+        xhr.send();
+    }
+
+    function majFormulaire(id, name, cuisine) {
+        document.getElementById("id").value = id;
+        document.getElementById("name").value = name;
+        document.getElementById("cuisine").value = cuisine;
+    }
+
+    function updateRestaurant() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'updateRestaurant?'+serialize(document.getElementById('formRestaurantUpdate')), true);
+
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function (e) {
+
+            getRestaurants();
+
+        };
+
+        // On envoie les paramètres de début et taille des résultats
+        xhr.send();
+    }
+
+    function serialize(form) {
+        var field, l, s = [];
+        if (typeof form == 'object' && form.nodeName == "FORM") {
+            var len = form.elements.length;
+            for (var i=0; i<len; i++) {
+                field = form.elements[i];
+                if (field.name && !field.disabled && field.type != 'file' && field.type != 'reset' && field.type != 'submit' && field.type != 'button') {
+                    if (field.type == 'select-multiple') {
+                        l = form.elements[i].options.length;
+                        for (var j=0; j<l; j++) {
+                            if(field.options[j].selected)
+                                s[s.length] = encodeURIComponent(field.name) + "=" + encodeURIComponent(field.options[j].value);
+                        }
+                    } else if ((field.type != 'checkbox' && field.type != 'radio') || field.checked) {
+                        s[s.length] = encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value);
+                    }
+                }
+            }
+        }
+        return s.join('&').replace(/%20/g, '+');
+    }
+
+</script>
+
+<!-- Navbar -->
+<nav class="navbar navbar-default">
+    <div class="container-fluid" style="cursor:pointer">
+        <div class="navbar-header">
+            <a class="navbar-brand">TPMongo</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a onclick="testConnexion();">Connexion à MongoDB</a></li>
+            <li><a onclick="getRestaurants();">Afficher la liste des restaurants</a></li>
+            <li><a data-toggle="modal" data-target="#myModal">Créer un restaurant</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Content -->
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12" id="tableau">
+
+        </div>
+    </div>
+    <div class="row" id="pagination">
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Créer un restaurant</h4>
+            </div>
+            <form method="get" action="" id="formRestaurantCreate">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="name">Nom:</label>
+                        <input type="text" class="form-control" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="cuisine">Cuisine:</label>
+                        <input type="text" class="form-control" name="cuisine">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input class="btn btn-primary" type="button" value="Créer" onclick="createRestaurant()"/>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="myModal2" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modifier un restaurant</h4>
+            </div>
+            <form method="get" action="" id="formRestaurantUpdate">
+                <div class="modal-body">
+
+                    <input type="hidden" class="form-control" id="id" name="id">
+                    <div class="form-group">
+                        <label for="name">Nom:</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="cuisine">Cuisine:</label>
+                        <input type="text" class="form-control" id="cuisine" name="cuisine">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input class="btn btn-primary" onclick="updateRestaurant()" type="button" value="Modifier"/>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>

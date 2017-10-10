@@ -158,7 +158,7 @@
     function deleteRestaurant(id) {
 
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'deleteRestaurant?id=' + id, true);
+        xhr.open('DELETE', 'deleteRestaurant?id=' + id, true);
 
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
@@ -174,7 +174,7 @@
 
     function createRestaurant() {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'createRestaurant?'+serialize(document.getElementById('formRestaurantCreate')), true);
+        xhr.open('PUT', 'createRestaurant?'+serialize(document.getElementById('formRestaurantCreate')), true);
 
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
@@ -196,7 +196,7 @@
 
     function updateRestaurant() {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'updateRestaurant?'+serialize(document.getElementById('formRestaurantUpdate')), true);
+        xhr.open('PUT', 'updateRestaurant?'+serialize(document.getElementById('formRestaurantUpdate')), true);
 
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 

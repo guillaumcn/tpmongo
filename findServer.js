@@ -141,20 +141,20 @@ app.get('/findRestaurants', function (req, res) {
 
 });
 
-app.get('/deleteRestaurant', function (req, res) {
+app.delete('/deleteRestaurant', function (req, res) {
     var id = req.query['id'];
     deleteRestaurants(id, function(){
         res.end();
     });
 });
 
-app.get('/createRestaurant', function (req, res) {
+app.put('/createRestaurant', function (req, res) {
     createRestaurant(req.query, function(){
         res.end();
     });
 });
 
-app.get('/updateRestaurant', function (req, res) {
+app.put('/updateRestaurant', function (req, res) {
     updateRestaurant(req.query, function(){
         res.end();
     });
